@@ -25,7 +25,6 @@ public class UserMealsUtil {
 
         List<UserMealWithExcess> mealsTo = filteredByCycles(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
         mealsTo.forEach(System.out::println);
-
     }
 
     public static List<UserMealWithExcess> filteredByCycles(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
@@ -40,7 +39,7 @@ public class UserMealsUtil {
                 for (int j: indexesList) {
                     UserMealWithExcess userMealWithExcess = userMealWithExcesses.get(j);
                     userMealWithExcesses.set(j, new UserMealWithExcess(
-                            userMeal.getDateTime(),
+                            userMealWithExcess.getDateTime(),
                             userMealWithExcess.getDescription(),
                             userMealWithExcess.getCalories(),
                             true));
