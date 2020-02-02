@@ -8,7 +8,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class UserMealsUtil {
@@ -29,48 +31,36 @@ public class UserMealsUtil {
     public static List<UserMealWithExcess> filteredByCycles(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         List<UserMealWithExcess> userMealWithExcesses = new ArrayList<>();
         Map<LocalDate, Integer> mapSumOfCalories = new HashMap<>();
-        Map<LocalDate, List<Integer>> mapIndexes = new HashMap<>();
+        Map<LocalDate, AtomicBoolean> mapBoolean = new HashMap<>();
         for (UserMeal userMeal: meals) {
             LocalDate localDate = userMeal.getDateTime().toLocalDate();
             boolean excess = (mapSumOfCalories.merge(localDate, userMeal.getCalories(), Integer::sum) > caloriesPerDay);
-            if (excess) {
-                List<Integer> indexesList = mapIndexes.getOrDefault(localDate, new ArrayList<>());
-                for (int j: indexesList) {
-                    UserMealWithExcess userMealWithExcess = userMealWithExcesses.get(j);
-                    userMealWithExcesses.set(j, new UserMealWithExcess(
-                            userMealWithExcess.getDateTime(),
-                            userMealWithExcess.getDescription(),
-                            userMealWithExcess.getCalories(),
-                            true));
-                }
-                mapIndexes.remove(localDate);
-            }
+            mapBoolean.getOrDefault(localDate, new AtomicBoolean(excess)).getAndSet(excess);
+            mapBoolean.putIfAbsent(localDate, new AtomicBoolean(excess));
             if (TimeUtil.isBetweenInclusive(userMeal.getDateTime().toLocalTime(), startTime, endTime)) {
-                userMealWithExcesses.add(new UserMealWithExcess(userMeal.getDateTime(), userMeal.getDescription(), userMeal.getCalories(), excess));
-                if (!excess) {
-                    mapIndexes.computeIfAbsent(localDate, key -> new ArrayList<>()).add(userMealWithExcesses.size() - 1);
-                }
+                userMealWithExcesses.add(new UserMealWithExcess(userMeal.getDateTime(), userMeal.getDescription(), userMeal.getCalories(), mapBoolean.get(localDate)));
             }
         }
         return userMealWithExcesses;
     }
 
     public static List<UserMealWithExcess> filteredByStreams(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
-        List<UserMealWithExcess> result = new ArrayList<>();
-        meals.stream()
-                .collect(Collectors.groupingBy(userMeal -> userMeal.getDateTime().toLocalDate()))
-                .forEach((key, value) -> {
-                    int sum = value.stream().mapToInt(UserMeal::getCalories).sum();
-                    value.stream()
-                            .filter(userMeal -> TimeUtil.isBetweenInclusive(userMeal.getDateTime().toLocalTime(), startTime, endTime))
-                            .forEach(userMeal ->
-                                result.add(new UserMealWithExcess(
-                                        userMeal.getDateTime(),
-                                        userMeal.getDescription(),
-                                        userMeal.getCalories(),
-                                        sum > caloriesPerDay))
-                            );
-                });
-        return result;
+        Map<LocalDate, Integer> mapSumOfCalories = new HashMap<>();
+        Map<LocalDate, AtomicBoolean> mapBoolean = new HashMap<>();
+        return meals.stream()
+                .map(userMeal -> {
+                    LocalDate localDate = userMeal.getDateTime().toLocalDate();
+                    boolean excess = (mapSumOfCalories.merge(localDate, userMeal.getCalories(), Integer::sum) > caloriesPerDay);
+                    mapBoolean.getOrDefault(localDate, new AtomicBoolean(excess)).getAndSet(excess);
+                    mapBoolean.putIfAbsent(localDate, new AtomicBoolean(excess));
+                    return new UserMealWithExcess(
+                        userMeal.getDateTime(),
+                        userMeal.getDescription(),
+                        userMeal.getCalories(),
+                        mapBoolean.get(localDate));
+                })
+                .filter(userMealWithExcess -> TimeUtil.isBetweenInclusive(userMealWithExcess.getDateTime().toLocalTime(), startTime, endTime))
+                .collect(Collectors.toList());
+
     }
 }
