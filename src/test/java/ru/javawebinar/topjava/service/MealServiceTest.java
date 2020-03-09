@@ -29,53 +29,23 @@ import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
-@ContextConfiguration({
-        "classpath:spring/spring-app.xml",
-        "classpath:spring/spring-db.xml"
-})
-@RunWith(SpringRunner.class)
-@Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
-@ActiveProfiles(resolver = ActiveDbProfileResolver.class)
-public abstract class MealServiceTest {
-    private static final Logger log = getLogger("result");
 
-    private static StringBuilder results = new StringBuilder();
 
-    @Rule
-    // http://stackoverflow.com/questions/14892125/what-is-the-best-practice-to-determine-the-execution-time-of-the-bussiness-relev
-    public Stopwatch stopwatch = new Stopwatch() {
-        @Override
-        protected void finished(long nanos, Description description) {
-            String result = String.format("\n%-25s %7d", description.getMethodName(), TimeUnit.NANOSECONDS.toMillis(nanos));
-            results.append(result);
-            log.info(result + " ms\n");
-        }
-    };
-
-    @AfterClass
-    public static void printResult() {
-        log.info("\n---------------------------------" +
-                "\nTest                 Duration, ms" +
-                "\n---------------------------------" +
-                results +
-                "\n---------------------------------");
-    }
-
+public abstract class MealServiceTest extends AbstractServiceTest {
     @Autowired
     private MealService service;
     @Autowired
     private MealRepository repository;
 
-    @Test
+    @Override
     public void delete() throws Exception {
         service.delete(MEAL1_ID, USER_ID);
         Assert.assertNull(repository.get(MEAL1_ID, USER_ID));
     }
 
-    @Test
+    @Override
     public void deleteNotFound() throws Exception {
-        Assert.assertThrows(NotFoundException.class,
-                () -> service.delete(1, USER_ID));
+        service.delete(1, USER_ID);
     }
 
     @Test
@@ -84,7 +54,7 @@ public abstract class MealServiceTest {
                 () -> service.delete(MEAL1_ID, ADMIN_ID));
     }
 
-    @Test
+    @Override
     public void create() throws Exception {
         Meal newMeal = getNew();
         Meal created = service.create(newMeal, USER_ID);
@@ -94,16 +64,15 @@ public abstract class MealServiceTest {
         MEAL_MATCHER.assertMatch(service.get(newId, USER_ID), newMeal);
     }
 
-    @Test
+    @Override
     public void get() throws Exception {
         Meal actual = service.get(ADMIN_MEAL_ID, ADMIN_ID);
         MEAL_MATCHER.assertMatch(actual, ADMIN_MEAL1);
     }
 
-    @Test
+    @Override
     public void getNotFound() throws Exception {
-        Assert.assertThrows(NotFoundException.class,
-                () -> service.get(MEAL1_ID, ADMIN_ID));
+        service.get(MEAL1_ID, ADMIN_ID);
     }
 
     @Test
@@ -112,7 +81,7 @@ public abstract class MealServiceTest {
                 () -> service.get(MEAL1_ID, ADMIN_ID));
     }
 
-    @Test
+    @Override
     public void update() throws Exception {
         Meal updated = getUpdated();
         service.update(updated, USER_ID);
@@ -126,7 +95,7 @@ public abstract class MealServiceTest {
         Assert.assertEquals("Not found entity with id=" + MEAL1_ID, ex.getMessage());
     }
 
-    @Test
+    @Override
     public void getAll() throws Exception {
         MEAL_MATCHER.assertMatch(service.getAll(USER_ID), MEALS);
     }

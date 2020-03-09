@@ -22,15 +22,9 @@ import java.util.List;
 
 import static ru.javawebinar.topjava.UserTestData.*;
 
-@ContextConfiguration({
-        "classpath:spring/spring-app.xml",
-        "classpath:spring/spring-db.xml"
-})
-@RunWith(SpringRunner.class)
-@Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
-@ActiveProfiles(resolver = ActiveDbProfileResolver.class)
-public abstract class UserServiceTest {
 
+
+public abstract class UserServiceTest extends AbstractServiceTest {
     @Autowired
     private UserService service;
     @Autowired
@@ -44,7 +38,7 @@ public abstract class UserServiceTest {
         cacheManager.getCache("users").clear();
     }
 
-    @Test
+    @Override
     public void create() throws Exception {
         User newUser = getNew();
         User created = service.create(newUser);
@@ -59,23 +53,26 @@ public abstract class UserServiceTest {
         service.create(new User(null, "Duplicate", "user@yandex.ru", "newPass", Role.ROLE_USER));
     }
 
+
+    @Override
     public void delete() throws Exception {
         service.delete(USER_ID);
         Assert.assertNull(repository.get(USER_ID));
     }
 
-    @Test(expected = NotFoundException.class)
-    public void deletedNotFound() throws Exception {
+    @Override
+    public void deleteNotFound() throws Exception {
         service.delete(1);
     }
 
-    @Test
+
+    @Override
     public void get() throws Exception {
         User user = service.get(USER_ID);
         USER_MATCHER.assertMatch(user, USER);
     }
 
-    @Test(expected = NotFoundException.class)
+    @Override
     public void getNotFound() throws Exception {
         service.get(1);
     }
@@ -86,14 +83,14 @@ public abstract class UserServiceTest {
         USER_MATCHER.assertMatch(user, USER);
     }
 
-    @Test
+    @Override
     public void update() throws Exception {
         User updated = getUpdated();
         service.update(updated);
         USER_MATCHER.assertMatch(service.get(USER_ID), updated);
     }
 
-    @Test
+    @Override
     public void getAll() throws Exception {
         List<User> all = service.getAll();
         USER_MATCHER.assertMatch(all, ADMIN, USER);
