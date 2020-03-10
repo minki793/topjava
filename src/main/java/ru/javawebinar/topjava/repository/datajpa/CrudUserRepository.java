@@ -7,6 +7,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.User;
 
+import java.util.Optional;
+
 @Transactional(readOnly = true)
 public interface CrudUserRepository extends JpaRepository<User, Integer> {
     @Transactional
@@ -14,6 +16,10 @@ public interface CrudUserRepository extends JpaRepository<User, Integer> {
 //    @Query(name = User.DELETE)
     @Query("DELETE FROM User u WHERE u.id=:id")
     int delete(@Param("id") int id);
+
+    @Override
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roles LEFT JOIN FETCH u.meals m WHERE u.id = :id ORDER BY m.dateTime DESC")
+    Optional<User> findById(@Param("id") Integer integer);
 
     User getByEmail(String email);
 }
