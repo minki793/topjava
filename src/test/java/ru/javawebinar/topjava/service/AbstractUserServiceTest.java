@@ -5,8 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
 import ru.javawebinar.topjava.Profiles;
@@ -32,17 +30,14 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     @Autowired
     private CacheManager cacheManager;
 
-    @Autowired(required = false)
-    protected JpaUtil jpaUtil;
 
     @Autowired
     private Environment environment;
 
-    @Before
-    public void setUp() throws Exception {
+    public void set(JpaUtil jpaUtil) throws Exception {
         List<String> profiles = List.of(environment.getActiveProfiles());
+        cacheManager.getCache("users").clear();
         if (profiles.contains(Profiles.DATAJPA) || profiles.contains(Profiles.JPA)) {
-            cacheManager.getCache("users").clear();
             jpaUtil.clear2ndLevelHibernateCache();
        }
     }

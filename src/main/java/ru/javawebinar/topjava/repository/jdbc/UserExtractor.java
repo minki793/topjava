@@ -23,11 +23,10 @@ public class UserExtractor implements ResultSetExtractor<List<User>> {
         while (rs.next()) {
             User user = JdbcUserRepository.ROW_MAPPER.mapRow(rs, ++row);
             String roleS = rs.getString("role");
+            List<Role> roles = data.computeIfAbsent(user, k -> {userList.add(user); return new ArrayList<>();});
             if (roleS != null) {
                 Role role = Role.valueOf(roleS);
-                data.computeIfAbsent(user, k -> {userList.add(user); return new ArrayList<>();}).add(role);
-            } else {
-                data.computeIfAbsent(user, k -> {userList.add(user); return new ArrayList<>();});
+                roles.add(role);
             }
         }
         for (Map.Entry<User, List<Role>> entry: data.entrySet()) {
@@ -36,4 +35,6 @@ public class UserExtractor implements ResultSetExtractor<List<User>> {
         }
         return userList;
     }
+
+
 }

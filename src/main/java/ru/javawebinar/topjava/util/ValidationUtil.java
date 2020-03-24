@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class ValidationUtil {
 
-    private static final Validator VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();;
+    private static final Validator VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
 
 
     private ValidationUtil() {
