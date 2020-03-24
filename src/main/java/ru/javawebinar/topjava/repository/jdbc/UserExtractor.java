@@ -25,15 +25,14 @@ public class UserExtractor implements ResultSetExtractor<List<User>> {
             String roleS = rs.getString("role");
             if (roleS != null) {
                 Role role = Role.valueOf(roleS);
-                data.computeIfAbsent(user, k -> new ArrayList<>()).add(role);
+                data.computeIfAbsent(user, k -> {userList.add(user); return new ArrayList<>();}).add(role);
             } else {
-                data.putIfAbsent(user, new ArrayList<>());
+                data.computeIfAbsent(user, k -> {userList.add(user); return new ArrayList<>();});
             }
         }
         for (Map.Entry<User, List<Role>> entry: data.entrySet()) {
             User user = entry.getKey();
             user.setRoles(entry.getValue());
-            userList.add(user);
         }
         return userList;
     }
