@@ -9,7 +9,7 @@ dt {
     width: 170px;
 }
 
-dd {
+dl {
     display: inline-block;
     margin-left: 8px;
     vertical-align: top;
