@@ -3,10 +3,17 @@
 function filter() {
     $.ajax({
         type: "GET",
-        url: "ajax/profile/meals/filter",
+        url: context.ajaxUrl + "filter",
         data: $('#filterForm').serialize()
     }).done(function(data) {
-        context.datatableApi.clear().rows.add(data).draw();
+        drawTable(data);
+    });
+}
+
+function clearfilter() {
+    $('#filterForm').trigger('reset');
+    $.get(context.ajaxUrl, function (data) {
+        drawTable(data);
     });
 }
 
@@ -14,6 +21,7 @@ function filter() {
 $(function () {
     makeEditable({
             ajaxUrl: "ajax/profile/meals/",
+            meal: true,
             datatableApi: $("#datatable").DataTable({
                 "paging": false,
                 "info": true,

@@ -33,10 +33,18 @@ function deleteRow(id) {
     });
 }
 
+function drawTable(data) {
+    context.datatableApi.clear().rows.add(data).draw();
+}
+
 function updateTable() {
-    $.get(context.ajaxUrl, function (data) {
-        context.datatableApi.clear().rows.add(data).draw();
-    });
+    if (context.meal == true) {
+        filter();
+    } else {
+        $.get(context.ajaxUrl, function (data) {
+            drawTable(data);
+        });
+    }
 }
 
 function save() {
