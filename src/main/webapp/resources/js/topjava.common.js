@@ -19,7 +19,7 @@ function add() {
 
 function updateRow(id) {
     $("#modalTitle").html(i18n["editTitle"]);
-    $.get(context.ajaxUrl + id, function (data) {
+    $.get(context.ajaxUrl + id, function (data,) {
         $.each(data, function (key, value) {
             form.find("input[name='" + key + "']").val(value);
         });
@@ -83,7 +83,7 @@ function failNoty(jqXHR) {
     }).show();
 }
 
-function renderEditBtn(data, type, row) {
+function  renderEditBtn(data, type, row) {
     if (type === "display") {
         return "<a onclick='updateRow(" + row.id + ");'><span class='fa fa-pencil'></span></a>";
     }

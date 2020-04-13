@@ -1,3 +1,6 @@
+var mealAjaxUrl = "ajax/profile/meals/";
+
+
 function updateFilteredTable() {
     $.ajax({
         type: "GET",
@@ -11,15 +14,35 @@ function clearFilter() {
     $.get("ajax/profile/meals/", updateTableByData);
 }
 
+$.ajaxSetup({
+    converters: {
+        "text json": function (json_string) {
+            var json = $.parseJSON(json_string);
+            if (json instanceof Array) {
+                json.forEach(json_value =>
+                    json_value.dateTime = json_value.dateTime.replace('T', ' ')
+                );
+            } else {
+                json.dateTime = json.dateTime.replace('T', ' ');
+            }
+            return json;
+        }
+    }
+});
+
 $(function () {
     makeEditable({
-        ajaxUrl: "ajax/profile/meals/",
+        ajaxUrl: mealAjaxUrl,
         datatableApi: $("#datatable").DataTable({
+            "ajax": {
+                "url": mealAjaxUrl,
+                "dataSrc": ""
+            },
             "paging": false,
             "info": true,
             "columns": [
                 {
-                    "data": "dateTime"
+                    "data": "dateTime",
                 },
                 {
                     "data": "description"
@@ -28,12 +51,14 @@ $(function () {
                     "data": "calories"
                 },
                 {
-                    "defaultContent": "Edit",
-                    "orderable": false
+                    "orderable": false,
+                    "defaultContent": "",
+                    "render": renderEditBtn
                 },
                 {
-                    "defaultContent": "Delete",
-                    "orderable": false
+                    "orderable": false,
+                    "defaultContent": "",
+                    "render": renderDeleteBtn
                 }
             ],
             "order": [
@@ -41,8 +66,38 @@ $(function () {
                     0,
                     "desc"
                 ]
-            ]
+            ],
+            "createdRow": function (row, data, dataIndex) {
+                $(row).attr("data-mealExcess", data.excess);
+            }
         }),
         updateTable: updateFilteredTable
+    });
+
+    $.datetimepicker.setLocale('ru');
+
+    $("#startDate").datetimepicker({
+        timepicker:false,
+        format:'d.m.Y'
+    });
+
+    $("#startTime").datetimepicker({
+        datepicker:false,
+        format:'H:i'
+    });
+
+    $("#endDate").datetimepicker({
+        timepicker:false,
+        format:'d.m.Y'
+    });
+
+    $("#endTime").datetimepicker({
+        datepicker:false,
+        format:'H:i'
+    });
+
+    $("#dateTime").datetimepicker({
+        format:'d.m.Y H:i',
+        lang:'ru'
     });
 });

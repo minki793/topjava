@@ -1,10 +1,18 @@
 package ru.javawebinar.topjava.to;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.validator.constraints.Range;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.beans.ConstructorProperties;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
-public class MealTo extends BaseTo {
+import ru.javawebinar.topjava.util.DateTimeUtil;
+public class MealTo extends BaseTo implements Serializable {
 
     private final LocalDateTime dateTime;
 
