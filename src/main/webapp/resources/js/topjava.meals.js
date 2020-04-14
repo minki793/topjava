@@ -74,11 +74,11 @@ $(function () {
         updateTable: updateFilteredTable
     });
 
-    $.datetimepicker.setLocale('ru');
+    $.datetimepicker.setLocale("ru");
 
     $("#startDate").datetimepicker({
         timepicker:false,
-        format:'d.m.Y'
+        format:'Y-m-d'
     });
 
     $("#startTime").datetimepicker({
@@ -88,7 +88,7 @@ $(function () {
 
     $("#endDate").datetimepicker({
         timepicker:false,
-        format:'d.m.Y'
+        format:'Y-m-d'
     });
 
     $("#endTime").datetimepicker({
@@ -97,7 +97,7 @@ $(function () {
     });
 
     $("#dateTime").datetimepicker({
-        format:'d.m.Y H:i',
+        format:'Y-m-d H:i',
         lang:'ru'
     });
 });
