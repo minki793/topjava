@@ -20,10 +20,12 @@ $.ajaxSetup({
             var json = $.parseJSON(json_string);
             if (json instanceof Array) {
                 json.forEach(json_value =>
-                    json_value.dateTime = json_value.dateTime.replace('T', ' ')
+                    json_value.dateTime = json_value.dateTime.replace('T', ' ').substr(0, 16)
                 );
             } else {
-                json.dateTime = json.dateTime.replace('T', ' ');
+                if (json.hasOwnProperty("dateTime")) {
+                    json.dateTime = json.dateTime.replace('T', ' ').substr(0, 16);
+                }
             }
             return json;
         }
