@@ -4,7 +4,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import ru.javawebinar.topjava.AuthorizedUser;
 import ru.javawebinar.topjava.web.SecurityUtil;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 

@@ -31,6 +31,7 @@ public class UserTestData {
         updated.setName("UpdatedName");
         updated.setCaloriesPerDay(330);
         updated.setRoles(Collections.singletonList(Role.ADMIN));
+
         return updated;
     }
 }

@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ValidationUtil {
+    public static String duplicateEmail = "User with this email already exists";
 
     private ValidationUtil() {
     }
@@ -77,12 +78,14 @@ public class ValidationUtil {
             throw new ConstraintViolationException(violations);
         }
     }
+    public static  String resultMessage(BindingResult result) {
+        return result.getFieldErrors().stream()
+                .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
+                .collect(Collectors.joining("<br>"));
+    }
+
 
     public static ResponseEntity<String> getErrorResponse(BindingResult result) {
-        return ResponseEntity.unprocessableEntity().body(
-                result.getFieldErrors().stream()
-                        .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
-                        .collect(Collectors.joining("<br>"))
-        );
+        return ResponseEntity.unprocessableEntity().body(resultMessage(result));
     }
 }
